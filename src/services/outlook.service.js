@@ -184,13 +184,14 @@ class OutlookService {
 
     async getAccessToken() {
         const dataRefreshToken = await this.getDataFromRefreshToken();
+        let currentRefreshToken = dataRefreshToken.refresh_token;
         const isReadMailByGraph = dataRefreshToken.scope && dataRefreshToken.scope.includes('Mail.Read');
         if (isReadMailByGraph) {
             const dataRefreshToken = await this.getDataFromRefreshToken('https://graph.microsoft.com/Mail.ReadWrite');
             return {
                 type: TYPE_GRAPH,
                 access_token: dataRefreshToken.access_token,
-                refresh_token: dataRefreshToken.refresh_token
+                refresh_token: currentRefreshToken
             } 
         }
 
@@ -219,6 +220,7 @@ class OutlookService {
     async getMails() {
         const { type, access_token, refresh_token } = await this.getAccessToken();
         console.log(type);
+        console.log(refresh_token);
         let data = [];
         if (type === TYPE_IMAP) {
             data = await this.getMailsByIMAP(access_token);
@@ -226,7 +228,7 @@ class OutlookService {
             data = await this.getMailsByGraph(access_token);
         }
 
-        return { mails: data, refresh_token };
+        return { mails: data, type, refresh_token };
     }
 
     async getMailsByIMAP(access_token) {
@@ -331,7 +333,6 @@ class OutlookService {
     }
 
     async getMailsByGraph(access_token) {
-        console.log(access_token);
         const response = await fetch(process.env.GRAPH_BASE_URL + `/me/messages?$select=sender,subject,body,receivedDateTime&$top=${process.env.AMOUNT_MAIL_READ}`, {
             headers: {
                 'Authorization': `Bearer ${access_token}`
@@ -339,7 +340,6 @@ class OutlookService {
         });
 
         const data = await response.json();
-        console.log(data);
 
         return data.value.map(mail => ({
             subject: mail.subject || '(No subject)',

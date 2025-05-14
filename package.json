@@ -1,0 +1,23 @@
+{
+  "name": "read-mail-outlook",
+  "version": "1.0.0",
+  "description": "API để đọc mail Outlook",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "imap": "^0.8.19",
+    "imapflow": "^1.0.186",
+    "mailparser": "^3.7.2",
+    "node-imap": "^0.9.6",
+    "playwright": "^1.52.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
